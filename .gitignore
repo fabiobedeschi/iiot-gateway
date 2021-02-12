@@ -1,0 +1,13 @@
+# temporary files
+*~
+*.swp
+
+# hidden stuff
+.*
+!.editorconfig
+!.gitignore
+!.gitkeep
+!.yamllint
+
+# project specific
+*.zip
