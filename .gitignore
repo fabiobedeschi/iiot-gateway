@@ -5,9 +5,11 @@
 # hidden stuff
 .*
 !.editorconfig
+!.env
 !.gitignore
 !.gitkeep
 !.yamllint
 
 # project specific
 *.zip
+db/data
