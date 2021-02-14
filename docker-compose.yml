@@ -1,20 +1,21 @@
 version: "2"
 
+volumes:
+  dbdata:
+
 services:
-  server:
-    build:
-      context: ./server
-    ports:
-      - 80:80
   db:
     build:
       context: ./db
-    environment:
-      POSTGRES_PASSWORD: lorem
     ports:
       - 5432:5432
     volumes:
       - dbdata:/var/lib/postgresql/data
 
-volumes:
-  dbdata:
+  server:
+    depends_on:
+      - db
+    build:
+      context: ./server
+    ports:
+      - 80:80
