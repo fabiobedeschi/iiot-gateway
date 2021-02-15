@@ -4,6 +4,7 @@
 
 # hidden stuff
 .*
+!.dockerignore
 !.editorconfig
 !.env
 !.gitignore
