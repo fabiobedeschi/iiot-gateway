@@ -69,3 +69,13 @@ class Database:
             'delta': delta
         }
         return self.execute_query(sql, values)
+
+    # TODO: remove this before delivery
+    def delete_user(self, uuid):
+        sql = '''
+            DELETE FROM users
+            WHERE uuid = %(uuid)s
+            RETURNING uuid
+        '''
+        values = {'uuid': uuid}
+        return self.execute_query(sql, values)

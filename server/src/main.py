@@ -2,44 +2,52 @@ from flask import Flask
 from flask import request
 from flask.helpers import send_from_directory
 
+from .database import Database
+
 app = Flask(__name__)
+db = Database()
 
 
 @app.route('/users/<string:user_id>', methods=['GET'])
-def check_user(user_id):  # TODO: Check if exists in DB
-    if user_id == "FFFFFFFFFFFFFFFF0001020304050607":
-        return user_id, 200
-    else:
-        return user_id, 403
+def check_user(user_id):
+    user = db.find_user(user_id)
+    return user_id, (200 if user else 404)
 
 
 @app.route('/users/<string:user_id>', methods=['PUT', 'PATCH'])
-def update_user(user_id):  # TODO: Update new value in DB to track
-    data = request.json
-    s = ""
-
-    for n in data:
-        a = data[n]
-        print(n, "è", a, sep=" ")
-        s = ("%s<br>%s  è %s ") % (s, n, a)
-    return s, 200
+def update_user(user_id):
+    # TODO: Update new value in DB to track
+    return user_id, 201
 
 
 @app.route('/waste_bins/<string:waste_bin_id>', methods=['PUT', 'PATCH'])
-def update_waste_bin(waste_bin_id):  # TODO: Update new value in DB to track
-    data = request.json
-    s = ""
-
-    for n in data:
-        a = data[n]
-        print(n, "è", a, sep=" ")
-        s = ("%s<br>%s  è %s ") % (s, n, a)
-    return s, 200
+def update_waste_bin(waste_bin_id):
+    # TODO: Update new value in DB to track
+    return waste_bin_id, 201
 
 
+# TODO: remove this before delivery
 @app.route('/hello')
 def hello_world():
     return send_from_directory(directory='../static', filename='example.html')
+
+
+# TODO: remove this before delivery
+@app.route('/users/<string:user_id>', methods=['POST'])
+def create_user(user_id):
+    user = None
+    if check_user(user_id)[1] == 404:
+        user = db.insert_user(user_id)
+    return user_id, (201 if user else 409)
+
+
+# TODO: remove this before delivery
+@app.route('/users/<string:user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    user = None
+    if check_user(user_id)[1] == 200:
+        user = db.delete_user(user_id)
+    return user_id, (200 if user else 404)
 
 
 if __name__ == '__main__':
