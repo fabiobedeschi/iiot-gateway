@@ -57,6 +57,19 @@ class Database:
         values = {'uuid': uuid}
         return self.execute_query(sql, values)
 
+    def update_user(self, uuid, delta):
+        sql = '''
+            UPDATE users
+            SET delta = delta + %(delta)s, updated_at = NOW()
+            WHERE uuid = %(uuid)s
+            RETURNING uuid
+        '''
+        values = {
+            'uuid': uuid,
+            'delta': delta
+        }
+        return self.execute_query(sql, values)
+
     # TODO: remove this before delivery
     def insert_user(self, uuid, delta=0):
         sql = '''
