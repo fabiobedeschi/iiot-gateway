@@ -6,7 +6,6 @@
 .*
 !.dockerignore
 !.editorconfig
-!.env
 !.gitignore
 !.gitkeep
 !.yamllint

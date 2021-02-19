@@ -1,33 +1,62 @@
-from flask import Flask
-from flask import request
+from flask import Flask, request
 from flask.helpers import send_from_directory
 
+from .database import Database
+
 app = Flask(__name__)
-
-@app.route('/users/<string:userid>', methods=['GET'])
-def check_user(userid): #TODO: Check if exists in DB
-    if userid == "FFFFFFFFFFFFFFFF0001020304050607":
-        return userid, 200
-    else:
-        return userid, 403
-    return userid
+db = Database()
 
 
-@app.route('/users/<string:userid>/update', methods=['PATCH'])
-def update_user(userid): #TODO: Update new value in DB to track 
-    data = request.json
-    s =""
-
-    for n in data :
-        a = data[n]
-        print(n,"è",a,sep=" ")
-        s = ( "%s<br>%s  è %s " ) % (s, n, a)
-    return s, 200
+@app.route('/users/<string:user_id>', methods=['GET'])
+def check_user(user_id):
+    result = db.find_user(user_id)
+    return user_id, (200 if result else 404)
 
 
-@app.route('/')
+@app.route('/users/<string:user_id>', methods=['PUT', 'PATCH'])
+def update_user(user_id):
+    result = None
+    if data := request.json:
+        result = db.update_user(
+            uuid=user_id,
+            delta=data.get('delta', 0)
+        )
+    return user_id, (200 if result else 404)
+
+
+@app.route('/waste_bins/<string:waste_bin_id>', methods=['PUT', 'PATCH'])
+def update_waste_bin(waste_bin_id):
+    result = None
+    if data := request.json:
+        result = db.update_waste_bin(
+            uuid=waste_bin_id,
+            fill_level=data.get('fill_level'),
+        )
+    return waste_bin_id, (200 if result else 404)
+
+
+# TODO: remove this before delivery
+@app.route('/hello')
 def hello_world():
     return send_from_directory(directory='../static', filename='example.html')
+
+
+# TODO: remove this before delivery
+@app.route('/users/<string:user_id>', methods=['POST'])
+def create_user(user_id):
+    result = None
+    if check_user(user_id)[1] == 404:
+        result = db.insert_user(user_id)
+    return user_id, (201 if result else 409)
+
+
+# TODO: remove this before delivery
+@app.route('/users/<string:user_id>', methods=['DELETE'])
+def remove_user(user_id):
+    result = None
+    if check_user(user_id)[1] == 200:
+        result = db.delete_user(user_id)
+    return user_id, (200 if result else 404)
 
 
 if __name__ == '__main__':
