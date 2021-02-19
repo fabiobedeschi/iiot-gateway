@@ -15,17 +15,24 @@ def check_user(user_id):
 
 @app.route('/users/<string:user_id>', methods=['PUT', 'PATCH'])
 def update_user(user_id):
-    data = request.json
     result = None
-    if data:
-        result = db.update_user(user_id, data.get('delta', 0))
+    if data := request.json:
+        result = db.update_user(
+            uuid=user_id,
+            delta=data.get('delta', 0)
+        )
     return user_id, (200 if result else 404)
 
 
 @app.route('/waste_bins/<string:waste_bin_id>', methods=['PUT', 'PATCH'])
 def update_waste_bin(waste_bin_id):
-    # TODO: Update new value in DB to track
-    return waste_bin_id, 201
+    result = None
+    if data := request.json:
+        result = db.update_waste_bin(
+            uuid=waste_bin_id,
+            fill_level=data.get('fill_level'),
+        )
+    return waste_bin_id, (200 if result else 404)
 
 
 # TODO: remove this before delivery

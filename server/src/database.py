@@ -70,6 +70,19 @@ class Database:
         }
         return self.execute_query(sql, values)
 
+    def update_waste_bin(self, uuid, fill_level):
+        sql = '''
+            UPDATE waste_bins
+            SET fill_level = %(fill_level)s, updated_at = NOW()
+            WHERE uuid = %(uuid)s
+            RETURNING uuid
+        '''
+        values = {
+            'uuid': uuid,
+            'fill_level': fill_level
+        }
+        return self.execute_query(sql, values)
+
     # TODO: remove this before delivery
     def insert_user(self, uuid, delta=0):
         sql = '''
