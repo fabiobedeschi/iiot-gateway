@@ -18,6 +18,12 @@ def init_app():
         db = Database()
 
 
+@app.route('/')
+@accept('text/html')
+def root_page():
+    return render_template('root.html')
+
+
 @app.route('/users', methods=['GET'])
 @accept_fallback
 def find_all_users():

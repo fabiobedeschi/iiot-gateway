@@ -3,8 +3,6 @@
     <head>
         <meta charset="UTF-8">
         <title>{{ name }}</title>
-    </head>
-    <body>
         <style type="text/css">
             .tg {
                 border-collapse: collapse;
@@ -94,9 +92,11 @@
                 }
             }
         </style>
-
+    </head>
+    <body>
         <div style="margin: 16pt">
             <h1>{{ name }} collection:</h1>
+            {% if collection %}
             <div class="tg-wrap">
                 <table id="tg-nLpmT" class="tg">
                     <thead>
@@ -117,6 +117,7 @@
                     </tbody>
                 </table>
             </div>
+            {% endif %}
         </div>
 
         <!-- Javascript -->
