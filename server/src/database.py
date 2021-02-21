@@ -78,6 +78,20 @@ class Database:
         }
         return self._execute_query(sql, values)
 
+    def find_all_waste_bins(self) -> [RealDictRow]:
+        sql = '''
+            SELECT * FROM waste_bins
+        '''
+        return self._execute_query(sql, fetch_all=True)
+
+    def find_waste_bin(self, uuid) -> RealDictRow:
+        sql = '''
+            SELECT * FROM waste_bins
+            WHERE uuid = %(uuid)s
+        '''
+        values = {'uuid': uuid}
+        return self._execute_query(sql, values)
+
     def update_waste_bin(self, uuid, fill_level) -> RealDictRow:
         sql = '''
             UPDATE waste_bins
