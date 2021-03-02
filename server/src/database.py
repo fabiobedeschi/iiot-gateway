@@ -1,5 +1,6 @@
 from logging import getLogger
 from os import getenv
+from typing import List
 
 from psycopg2 import connect, Error
 from psycopg2.extras import RealDictCursor, RealDictRow
@@ -40,7 +41,7 @@ class Database:
                 self.connection.rollback()
                 raise e
 
-    def find_all_users(self) -> [RealDictRow]:
+    def find_all_users(self) -> List[RealDictRow]:
         sql = '''
             SELECT * FROM users
         '''
@@ -67,7 +68,7 @@ class Database:
         }
         return self._execute_query(sql, values)
 
-    def find_all_waste_bins(self) -> [RealDictRow]:
+    def find_all_waste_bins(self) -> List[RealDictRow]:
         sql = '''
             SELECT * FROM waste_bins
         '''
