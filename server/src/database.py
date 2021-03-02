@@ -10,7 +10,6 @@ logger = getLogger()
 class Database:
     def __init__(self, connection=None, connection_conf=None):
         self.connection = connection or Database._init_connection(connection_conf)
-        self.cursor = None
 
     @staticmethod
     def _init_connection(connection_conf):
@@ -21,35 +20,25 @@ class Database:
             'port': getenv('POSTGRES_PORT'),
             'dbname': getenv('POSTGRES_DB'),
         }
-        return connect(**connection_conf)
+        connection = connect(**connection_conf)
+        logger.info('Successfully connected to database')
+        return connection
 
     def _open_cursor(self):
-        self.cursor = self.connection.cursor(cursor_factory=RealDictCursor)
-
-    def _close_cursor(self):
-        if self.cursor:
-            self.cursor.close()
-
-    def _commit(self):
-        self._close_cursor()
-        self.connection.commit()
-
-    def _rollback(self):
-        self._close_cursor()
-        self.connection.rollback()
+        return self.connection.cursor(cursor_factory=RealDictCursor)
 
     def _execute_query(self, sql, values=None, fetch_all=False):
-        self._open_cursor()
-        try:
-            self.cursor.execute(sql, values)
-            result = self.cursor.fetchall() if fetch_all else self.cursor.fetchone()
-            self._commit()
-            return result
+        with self._open_cursor() as cursor:
+            try:
+                cursor.execute(sql, values)
+                result = cursor.fetchall() if fetch_all else cursor.fetchone()
+                self.connection.commit()
+                return result
 
-        except Error as e:
-            logger.exception(f'Failed to execute query "{sql}" with values "{values}"')
-            self._rollback()
-            raise e
+            except Error as e:
+                logger.exception(f'Failed to execute query "{sql}" with values "{values}"')
+                self.connection.rollback()
+                raise e
 
     def find_all_users(self) -> [RealDictRow]:
         sql = '''

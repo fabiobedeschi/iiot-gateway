@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <title>{{ name }}</title>
+        <title>{{ title }}</title>
         <style type="text/css">
             .tg {
                 border-collapse: collapse;
@@ -95,22 +95,41 @@
     </head>
     <body>
         <div style="margin: 16pt">
-            <h1>{{ name }} collection:</h1>
+            <a href="{{ url_for('server.root_page') }}"><-- Back</a>
+            <h1>{{ title }} collection:</h1>
             {% if collection %}
             <div class="tg-wrap">
                 <table id="tg-nLpmT" class="tg">
                     <thead>
                         <tr>
                             {% for key in collection[0].keys() %}
-                            <th class="tg-ul38">{{ key }}</th>
+                            <th class="tg-ul38"><b>{{ key }}</b></th>
                             {% endfor %}
                         </tr>
                     </thead>
                     <tbody>
                         {% for elem in collection %}
                         <tr>
-                            {% for _, val in elem.items() %}
-                            <td class="tg-0lax">{{ val }}</td>
+                            {% for key, val in elem.items() %}
+                            {% if key == 'uuid' %}
+                                {% if name == 'users' %}
+                                <td class="tg-0lax">
+                                    <a href="{{ url_for('server.find_user', uuid=val) }}">
+                                        {{ val }}
+                                    </a>
+                                </td>
+                                {% elif name == 'waste_bins' %}
+                                <td class="tg-0lax">
+                                    <a href="{{ url_for('server.find_waste_bin', uuid=val) }}">
+                                        {{ val }}
+                                    </a>
+                                </td>
+                                {% else %}
+                                <td class="tg-0lax">{{ val }}</td>
+                                {% endif %}
+                            {% else %}
+                                <td class="tg-0lax">{{ val }}</td>
+                            {% endif %}
                             {% endfor %}
                         </tr>
                         {% endfor %}
