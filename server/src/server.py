@@ -4,19 +4,23 @@ from flask import Blueprint, jsonify, render_template, request
 from flask_accept import accept, accept_fallback
 
 from .database import Database
+from .telemetry import Telemetry
 
 # Flask blueprint initialization
 server = Blueprint('server', __name__)
 
 # Global variables
 db: Optional[Database] = None
+tlm: Optional[Telemetry] = None
 
 
 @server.before_request
 def before_request():
-    global db
+    global db, tlm
     if not (db and db.connection):
         db = Database()
+    if not tlm:
+        tlm = Telemetry()
 
 
 @server.route('/')
@@ -29,7 +33,7 @@ def root_page():
 @accept_fallback
 def find_all_users():
     result = db.find_all_users()
-    return jsonify(result), 200 if result else 404
+    return jsonify(result), 200
 
 
 @find_all_users.support('text/html')
@@ -46,20 +50,27 @@ def find_user(uuid):
 
 @server.route('/users/<string:uuid>', methods=['PUT', 'PATCH'])
 def update_user(uuid):
-    result = None
-    if data := request.json:
-        result = db.update_user(
-            uuid=uuid,
-            delta=data.get('delta', 0)
-        )
-    return jsonify(result), 200 if result else 404
+    data = request.json
+    if not (data and data.get('delta')):
+        return jsonify(None), 400
+
+    result = db.update_user(
+        uuid=uuid,
+        delta=data.get('delta')
+    )
+
+    if result:
+        tlm.push_user_telemetry(user=result)
+        return jsonify(result), 200
+    else:
+        return jsonify(None), 404
 
 
 @server.route('/waste_bins', methods=['GET'])
 @accept_fallback
 def find_all_waste_bins():
     result = db.find_all_waste_bins()
-    return jsonify(result), 200 if result else 404
+    return jsonify(result), 200
 
 
 @find_all_waste_bins.support('text/html')
@@ -76,13 +87,20 @@ def find_waste_bin(uuid):
 
 @server.route('/waste_bins/<string:uuid>', methods=['PUT', 'PATCH'])
 def update_waste_bin(uuid):
-    result = None
-    if data := request.json:
-        result = db.update_waste_bin(
-            uuid=uuid,
-            fill_level=data.get('fill_level'),
-        )
-    return jsonify(result), 200 if result else 404
+    data = request.json
+    if not (data and data.get('fill_level')):
+        return jsonify(None), 400
+
+    result = db.update_waste_bin(
+        uuid=uuid,
+        fill_level=data.get('fill_level'),
+    )
+
+    if result:
+        tlm.push_waste_bin_telemetry(waste_bin=result)
+        return jsonify(result), 200 if result else 404
+    else:
+        return jsonify(None), 404
 
 
 # TODO: remove this before delivery

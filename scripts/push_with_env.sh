@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-grep -v '^#' .env | sed 's/^/--env /' | xargs balena push "$1"
+grep -v -E '^#|^[[:space:]]*$' .env | sed 's/^/--env /' | xargs balena push "$1"
