@@ -4,23 +4,20 @@ from flask import Blueprint, jsonify, render_template, request
 from flask_accept import accept, accept_fallback
 
 from .database import Database
-from .telemetry import Telemetry
+from .telemetry import push_user_telemetry, push_waste_bin_telemetry
 
 # Flask blueprint initialization
 server = Blueprint('server', __name__)
 
 # Global variables
 db: Optional[Database] = None
-tlm: Optional[Telemetry] = None
 
 
 @server.before_request
 def before_request():
-    global db, tlm
+    global db
     if not (db and db.connection):
         db = Database()
-    if not tlm:
-        tlm = Telemetry()
 
 
 @server.route('/')
@@ -60,7 +57,7 @@ def update_user(uuid):
     )
 
     if result:
-        tlm.push_user_telemetry(user=result)
+        push_user_telemetry(user=result)
         return jsonify(result), 200
     else:
         return jsonify(None), 404
@@ -97,7 +94,7 @@ def update_waste_bin(uuid):
     )
 
     if result:
-        tlm.push_waste_bin_telemetry(waste_bin=result)
+        push_waste_bin_telemetry(waste_bin=result)
         return jsonify(result), 200 if result else 404
     else:
         return jsonify(None), 404
