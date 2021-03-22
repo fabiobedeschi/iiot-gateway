@@ -19,3 +19,9 @@ services:
       context: ./server
     ports:
       - 80:80
+
+  subscriber:
+    depends_on:
+      - db
+    build:
+      context: ./subscriber
