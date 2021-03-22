@@ -16,7 +16,7 @@ def on_connect(client, userdata, flags, rc):
     logger.info('Successfully connected to mqtt broker')
 
     global db
-    db = Database()
+    db = Database(keep_retrying=True)
 
     client.subscribe(
         topic=getenv('GW_ZONE'),
