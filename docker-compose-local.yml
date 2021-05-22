@@ -9,6 +9,8 @@ services:
     build:
       context: ./db
     env_file: ./local/.env/host
+    ports:
+      - 5433:5432
     volumes:
       - ./local/.volumes/db-data:/var/lib/postgresql/data
 

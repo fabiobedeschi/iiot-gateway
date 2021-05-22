@@ -1,6 +1,7 @@
 # temporary files
 *~
 *.swp
+__pycache__
 
 # hidden stuff
 .*
