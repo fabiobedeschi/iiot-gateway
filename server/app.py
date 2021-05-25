@@ -1,6 +1,6 @@
 from flask import Flask
 
-from src.server import server_blueprint
+from .src.server import server_blueprint
 
 # Init Flask application
 app = Flask(__name__)

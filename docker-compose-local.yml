@@ -10,7 +10,7 @@ services:
       context: ./db
     env_file: ./local/.env/host
     ports:
-      - 5433:5432
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - ./local/.volumes/db-data:/var/lib/postgresql/data
 
@@ -21,7 +21,7 @@ services:
     build:
       context: ./server
     ports:
-      - 80:80
+      - "8080:80"
 
   subscriber:
     depends_on:
@@ -35,11 +35,10 @@ services:
     image: "thingsboard/tb-postgres"
     ports:
       - "9090:9090"
-      - "1883:1883"
+      - "${THINGSBOARD_PORT}:1883"
       - "5683:5683/udp"
-      - "5432:5432"
-    environment:
-      TB_QUEUE_TYPE: in-memory
+      - "54322:5432"
+    env_file: ./local/.env/host
     volumes:
       - ./local/.volumes/tb-data:/data
       - ./local/.volumes/tb-logs:/var/log/thingsboard
@@ -50,4 +49,4 @@ services:
       context: ./local/mosquitto
     env_file: ./local/.env/host
     ports:
-      - 1884:1883
+      - "${USERSERVICE_PORT}:1883"

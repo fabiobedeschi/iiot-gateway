@@ -1,6 +1,6 @@
 from os import getenv
-from src.subscriber import Subscriber
 
+from .src.subscriber import Subscriber
 
 if __name__ == '__main__':
     subscriber = Subscriber()

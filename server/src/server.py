@@ -1,3 +1,4 @@
+from os import getenv
 from typing import Optional
 
 from flask import Blueprint, jsonify, render_template, request
@@ -66,20 +67,6 @@ class GatewayServer:
         else:
             return None, 404
 
-    # TODO: remove this before delivery
-    def create_user(self, uuid):
-        result = None
-        if find_user(uuid)[1] == 404:
-            result = self.db.insert_user(uuid)
-        return result, 201 if result else 409
-
-    # TODO: remove this before delivery
-    def remove_user(self, uuid):
-        result = None
-        if find_user(uuid)[1] == 200:
-            result = self.db.delete_user(uuid)
-        return result, 200 if result else 404
-
 
 # Flask blueprint initialization
 server_blueprint = Blueprint('server', __name__)
@@ -92,7 +79,11 @@ server: Optional[GatewayServer] = None
 def before_request():
     global server
     if not server:
-        server = GatewayServer()
+        telemetry = True
+        if 'true' == getenv('DISABLE_TELEMETRY', 'false'):
+            telemetry = False
+        print(telemetry)
+        server = GatewayServer(telemetry=telemetry)
     server.before_request()
 
 
@@ -111,7 +102,7 @@ def find_all_users():
 
 @find_all_users.support('text/html')
 def find_all_users_html():
-    return render_template('table_collection.html', title='Users', name='users', collection=server.find_all_users())
+    return render_template('table_collection.html', title='Users', name='users', collection=server.find_all_users()[0])
 
 
 @server_blueprint.route('/users/<string:uuid>', methods=['GET'])
@@ -136,7 +127,7 @@ def find_all_waste_bins():
 @find_all_waste_bins.support('text/html')
 def find_all_waste_bins_html():
     return render_template('table_collection.html', title='Waste bins', name='waste_bins',
-                           collection=server.find_all_waste_bins())
+                           collection=server.find_all_waste_bins()[0])
 
 
 @server_blueprint.route('/waste_bins/<string:uuid>', methods=['GET'])
@@ -149,18 +140,3 @@ def find_waste_bin(uuid):
 def update_waste_bin(uuid):
     result, code = server.update_waste_bin(uuid, request.json)
     return jsonify(result), code
-
-
-# TODO: remove this before delivery
-@server_blueprint.route('/users/<string:uuid>', methods=['POST'])
-def create_user(uuid):
-    result, code = server.create_user(uuid)
-    return jsonify(result), code
-
-
-# TODO: remove this before delivery
-@server_blueprint.route('/users/<string:uuid>', methods=['DELETE'])
-def remove_user(uuid):
-    result, code = server.remove_user(uuid)
-    return jsonify(result), code
-
