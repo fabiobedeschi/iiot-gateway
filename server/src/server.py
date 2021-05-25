@@ -82,7 +82,6 @@ def before_request():
         telemetry = True
         if 'true' == getenv('DISABLE_TELEMETRY', 'false'):
             telemetry = False
-        print(telemetry)
         server = GatewayServer(telemetry=telemetry)
     server.before_request()
 

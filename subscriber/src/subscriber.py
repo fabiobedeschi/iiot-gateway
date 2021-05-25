@@ -11,9 +11,10 @@ logger = getLogger()
 
 class Subscriber(Client):
 
-    def __init__(self, db=None):
+    def __init__(self, db=None, topic=None):
         super().__init__()
         self.db = db or Database(keep_retrying=True)
+        self.topic = topic
         self.on_connect = self.sub_on_connect
         self.on_subscribe = self.sub_on_subscribe
         self.on_message = self.sub_on_message
@@ -21,12 +22,12 @@ class Subscriber(Client):
     def sub_on_connect(self, client, userdata, flags, rc):
         logger.info('Successfully connected to mqtt broker.')
         client.subscribe(
-            topic=getenv('GW_ZONE'),
+            topic=self.topic or getenv('GW_ZONE'),
             qos=int(getenv('USERSERVICE_QOS', 0))
         )
 
     def sub_on_subscribe(self, client, userdata, mid, granted_qos):
-        logger.info(f'Successfully subscribed to "{getenv("GW_ZONE")}" topic.')
+        logger.info(f'Successfully subscribed to "{self.topic or getenv("GW_ZONE")}" topic.')
 
     def sub_on_message(self, client, userdata, message):
         logger.info(f'Received message: {message}')
