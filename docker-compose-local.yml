@@ -1,0 +1,52 @@
+version: "3"
+
+services:
+  db:
+    container_name: "db"
+    depends_on:
+      - thingsboard
+      - mosquitto
+    build:
+      context: ./db
+    env_file: ./local/.env/host
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - ./local/.volumes/db-data:/var/lib/postgresql/data
+
+  server:
+    depends_on:
+      - db
+    env_file: ./local/.env/host
+    build:
+      context: ./server
+    ports:
+      - "8080:80"
+
+  subscriber:
+    depends_on:
+      - db
+    env_file: ./local/.env/host
+    build:
+      context: ./subscriber
+
+  thingsboard:
+    container_name: "thingsboard"
+    image: "thingsboard/tb-postgres"
+    ports:
+      - "9090:9090"
+      - "${THINGSBOARD_PORT}:1883"
+      - "5683:5683/udp"
+      - "54322:5432"
+    env_file: ./local/.env/host
+    volumes:
+      - ./local/.volumes/tb-data:/data
+      - ./local/.volumes/tb-logs:/var/log/thingsboard
+
+  mosquitto:
+    container_name: "mosquitto"
+    build:
+      context: ./local/mosquitto
+    env_file: ./local/.env/host
+    ports:
+      - "${USERSERVICE_PORT}:1883"

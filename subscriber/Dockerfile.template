@@ -4,9 +4,9 @@ FROM balenalib/%%BALENA_MACHINE_NAME%%-python:3.8-build
 
 WORKDIR /home/root
 
-COPY . ./
+COPY . ./subscriber
 
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
+RUN pip install -r subscriber/requirements.txt
 
-CMD ["python", "-um", "app"]
+CMD ["python", "-um", "subscriber.app"]

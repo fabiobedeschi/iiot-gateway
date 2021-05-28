@@ -1,11 +1,13 @@
 # temporary files
 *~
 *.swp
+__pycache__
 
 # hidden stuff
 .*
 !.dockerignore
 !.editorconfig
+!.env
 !.gitignore
 !.gitkeep
 !.yamllint
