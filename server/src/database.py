@@ -89,6 +89,16 @@ class Database:
         }
         return self._execute_query(sql, values)
 
+    def reset_user_delta(self, uuid):
+        sql = '''
+            UPDATE users
+            SET delta = 0, updated_at = NOW()
+            WHERE uuid = %(uuid)s
+            RETURNING *
+        '''
+        values = {'uuid': uuid}
+        return self._execute_query(sql, values)
+
     def find_all_waste_bins(self) -> List[RealDictRow]:
         sql = '''
             SELECT * FROM waste_bins

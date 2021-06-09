@@ -72,6 +72,8 @@ class TestGatewayServer(unittest.TestCase):
         self.assertEqual(404, code)
 
     def test_update_user_malformed_data(self):
+        self.skipTest('Not used anymore.')
+
         self.db.update_user.return_value = expected_result = None
         result, code = self.server.update_user(
             uuid='668e2987956a4943a9e6a2c77e56dc17',
@@ -81,6 +83,25 @@ class TestGatewayServer(unittest.TestCase):
         self.db.update_user.assert_not_called()
         self.assertEqual(expected_result, result)
         self.assertEqual(400, code)
+
+    def test_reset_user_delta(self):
+        self.db.reset_user_delta.return_value = expected_result = {
+            'uuid': '668e2987956a4943a9e6a2c77e56dc17',
+            'delta': 0
+        }
+        result, code = self.server.reset_user(uuid='668e2987956a4943a9e6a2c77e56dc17')
+        self.db.reset_user_delta.assert_called_with(
+            uuid='668e2987956a4943a9e6a2c77e56dc17'
+        )
+        self.assertEqual(expected_result, result)
+        self.assertEqual(200, code)
+
+    def test_reset_user_not_exists(self):
+        self.db.reset_user_delta.return_value = expected_result = None
+        result, code = self.server.reset_user(uuid='668e2987956a4943a9e6a2c77e56dc17')
+        self.db.reset_user_delta.assert_called_with(uuid='668e2987956a4943a9e6a2c77e56dc17')
+        self.assertEqual(expected_result, result)
+        self.assertEqual(404, code)
 
     def test_find_all_waste_bins_successfully(self):
         self.db.find_all_waste_bins.return_value = expected_result = [

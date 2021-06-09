@@ -26,13 +26,20 @@ class GatewayServer:
         return result, 200 if result else 404
 
     def update_user(self, uuid, data):
-        if not (data and data.get('delta')):
-            return None, 400
-
+        data = data or {}
         result = self.db.update_user(
             uuid=uuid,
-            delta=data.get('delta')
+            delta=data.get('delta', 1)
         )
+        if result:
+            if self.telemetry:
+                push_user_telemetry(user=result)
+            return result, 200
+        else:
+            return None, 404
+
+    def reset_user(self, uuid):
+        result = self.db.reset_user_delta(uuid=uuid)
         if result:
             if self.telemetry:
                 push_user_telemetry(user=result)
@@ -113,6 +120,12 @@ def find_user(uuid):
 @server_blueprint.route('/users/<string:uuid>', methods=['PUT', 'PATCH'])
 def update_user(uuid):
     result, code = server.update_user(uuid, request.json)
+    return jsonify(result), code
+
+
+@server_blueprint.route('/users/<string:uuid>/reset', methods=['PUT', 'PATCH'])
+def reset_user(uuid):
+    result, code = server.reset_user(uuid)
     return jsonify(result), code
 
 
