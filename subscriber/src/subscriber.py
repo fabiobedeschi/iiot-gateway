@@ -30,7 +30,7 @@ class Subscriber(Client):
 
     def obtain_all_users_in_zone(self):
         response = requests.get(
-            url=f"http://{getenv('USERSERVICE_HOST')}/users",
+            url=f"http://{getenv('USERSERVICE_HOST')}:{getenv('USERSERVICE_HTTP_PORT', '80')}/users",
             params={'area': getenv('GW_ZONE')}
         )
         for user in response.json():
