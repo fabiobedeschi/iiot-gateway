@@ -1,5 +1,6 @@
 from logging import getLogger
 from os import getenv
+import requests
 
 from paho.mqtt.client import Client
 from ujson import loads
@@ -25,6 +26,15 @@ class Subscriber(Client):
             topic=self.topic or getenv('GW_ZONE'),
             qos=int(getenv('USERSERVICE_QOS', 0))
         )
+        self.obtain_all_users_in_zone()
+
+    def obtain_all_users_in_zone(self):
+        response = requests.get(
+            url=f"http://{getenv('USERSERVICE_HOST')}/users",
+            params={'area': getenv('GW_ZONE')}
+        )
+        for user in response.json():
+            self.db.insert_user(uuid=user['uuid'])
 
     def sub_on_subscribe(self, client, userdata, mid, granted_qos):
         logger.info(f'Successfully subscribed to "{self.topic or getenv("GW_ZONE")}" topic.')
