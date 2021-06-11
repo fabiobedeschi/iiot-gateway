@@ -115,9 +115,10 @@ class Database:
 
     def update_waste_bin(self, uuid, fill_level) -> RealDictRow:
         sql = '''
-            UPDATE waste_bins
-            SET fill_level = %(fill_level)s, updated_at = NOW()
-            WHERE uuid = %(uuid)s
+            INSERT INTO waste_bins (uuid, fill_level, updated_at)
+            VALUES ( %(uuid)s, %(fill_level)s, NOW() )
+            ON CONFLICT (uuid) DO UPDATE
+                SET fill_level = %(fill_level)s, updated_at = NOW()
             RETURNING *
         '''
         values = {

@@ -93,6 +93,7 @@ class Database:
         sql = '''
             INSERT INTO users (uuid, delta, created_at, updated_at)
             VALUES (%(uuid)s, %(delta)s, now(), now())
+            ON CONFLICT DO NOTHING
             RETURNING *
         '''
         values = {
