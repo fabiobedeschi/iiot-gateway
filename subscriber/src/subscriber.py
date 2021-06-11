@@ -5,7 +5,7 @@ import requests
 from paho.mqtt.client import Client
 from ujson import loads
 
-from .database import Database
+from .database import Database, Error
 
 logger = getLogger()
 
@@ -33,8 +33,12 @@ class Subscriber(Client):
             url=f"http://{getenv('USERSERVICE_HOST')}:{getenv('USERSERVICE_HTTP_PORT', '80')}/users",
             params={'area': getenv('GW_ZONE')}
         )
-        for user in response.json():
-            self.db.insert_user(uuid=user['uuid'])
+        if response.ok:
+            for user in response.json():
+                try:
+                    self.db.insert_user(uuid=user['uuid'])
+                except Error:
+                    logger.info(f'User "{user["uuid"]}" was already in db.')
 
     def sub_on_subscribe(self, client, userdata, mid, granted_qos):
         logger.info(f'Successfully subscribed to "{self.topic or getenv("GW_ZONE")}" topic.')
