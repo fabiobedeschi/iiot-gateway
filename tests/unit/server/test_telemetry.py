@@ -6,7 +6,7 @@ from server.src.telemetry import *
 
 class TestTelemetry(unittest.TestCase):
 
-    def test_format_user_payload_successfully(self):
+    def test_format_user_payload_thingsboard_successfully(self):
         user = {
             'uuid': '8ca208ced569457cb7d93acb95d8cc45',
             'delta': 10,
@@ -24,6 +24,22 @@ class TestTelemetry(unittest.TestCase):
             ]
         }
         result = format_user_payload_thingsboard(user)
+        self.assertEqual(expected_result, result)
+
+    def test_format_user_payload_userservice_successfully(self):
+        user = {
+            'uuid': '8ca208ced569457cb7d93acb95d8cc45',
+            'delta': 10,
+            'created_at': datetime.utcnow(),
+            'updated_at': datetime.utcnow()
+        }
+        expected_result = {
+            "user": {
+                "uuid": user.get('uuid'),
+                "delta": user.get('delta')
+            }
+        }
+        result = format_user_payload_userservice(user)
         self.assertEqual(expected_result, result)
 
     def test_format_waste_bin_payload_successfully(self):

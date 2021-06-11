@@ -5,7 +5,7 @@ from flask import Blueprint, jsonify, render_template, request
 from flask_accept import accept, accept_fallback
 
 from .database import Database
-from .telemetry import push_user_telemetry, push_waste_bin_telemetry
+from .telemetry import push_user_telemetry, push_user_update, push_waste_bin_telemetry
 
 
 class GatewayServer:
@@ -34,6 +34,7 @@ class GatewayServer:
         if result:
             if self.telemetry:
                 push_user_telemetry(user=result)
+                push_user_update(user=result)
             return result, 200
         else:
             return None, 404
@@ -43,6 +44,7 @@ class GatewayServer:
         if result:
             if self.telemetry:
                 push_user_telemetry(user=result)
+                push_user_update(user=result)
             return result, 200
         else:
             return None, 404
