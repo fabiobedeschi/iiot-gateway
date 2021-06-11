@@ -16,7 +16,7 @@ class TestSubscriber(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls.fixtures = Fixtures()
-        cls.subscriber = Subscriber(topic=TOPIC)
+        cls.subscriber = Subscriber(topic=TOPIC, obtain_users=False)
         cls.subscriber.connect(
             host=getenv('USERSERVICE_HOST'),
             port=int(getenv('USERSERVICE_PORT', 1883)),

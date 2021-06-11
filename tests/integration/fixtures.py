@@ -21,11 +21,11 @@ class Fixtures(SerDatabase, SubDatabase):
     def close_connection(self):
         self.connection.close()
 
-    def insert_waste_bin(self, uuid, fill_level, max_level):
+    def insert_waste_bin(self, uuid, fill_level):
         query = f"""
-            INSERT INTO waste_bins(uuid, fill_level, max_level, created_at, updated_at)
-            VALUES (%s, %s, %s, now(), now())
+            INSERT INTO waste_bins(uuid, fill_level, created_at, updated_at)
+            VALUES (%s, %s, now(), now())
             RETURNING *
         """
-        values = (uuid, fill_level, max_level)
+        values = (uuid, fill_level)
         return self._execute_query(query, values)

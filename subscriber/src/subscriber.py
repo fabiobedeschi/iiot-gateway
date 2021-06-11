@@ -12,10 +12,11 @@ logger = getLogger()
 
 class Subscriber(Client):
 
-    def __init__(self, db=None, topic=None):
+    def __init__(self, db=None, topic=None, obtain_users: bool = None):
         super().__init__()
         self.db = db or Database(keep_retrying=True)
         self.topic = topic
+        self.obtain_users = obtain_users or ('true' == getenv('OBTAIN_USERS', 'true'))
         self.on_connect = self.sub_on_connect
         self.on_subscribe = self.sub_on_subscribe
         self.on_message = self.sub_on_message
@@ -26,7 +27,8 @@ class Subscriber(Client):
             topic=self.topic or getenv('GW_ZONE'),
             qos=int(getenv('USERSERVICE_QOS', 0))
         )
-        self.obtain_all_users_in_zone()
+        if self.obtain_users:
+            self.obtain_all_users_in_zone()
 
     def obtain_all_users_in_zone(self):
         response = requests.get(

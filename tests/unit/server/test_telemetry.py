@@ -23,7 +23,7 @@ class TestTelemetry(unittest.TestCase):
                 }
             ]
         }
-        result = format_user_payload(user)
+        result = format_user_payload_thingsboard(user)
         self.assertEqual(expected_result, result)
 
     def test_format_waste_bin_payload_successfully(self):
@@ -43,7 +43,7 @@ class TestTelemetry(unittest.TestCase):
                 }
             ]
         }
-        result = format_waste_bin_payload(waste_bin)
+        result = format_waste_bin_payload_thingsboard(waste_bin)
         self.assertEqual(expected_result, result)
 
 
